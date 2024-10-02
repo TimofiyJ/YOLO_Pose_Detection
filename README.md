@@ -16,7 +16,7 @@ with `webgl` backend.
 **Setup**
 
 ```bash
-git clone https://github.com/FatemeZamanian/YOLOv8-Pose-tfjs.git
+git clone https://github.com/TimofiyJ/YOLO_Pose_Detection.git
 cd yolov8-pose-tfjs
 yarn install #Install dependencies
 ```
