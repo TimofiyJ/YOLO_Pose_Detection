@@ -57,7 +57,7 @@ export const detect = async (source, model, canvasRef, callback = () => { }) => 
   const [input, xRatio, yRatio] = preprocess(source, modelWidth, modelHeight); // preprocess image
 
   const res = model.net.execute(input); // inference model
-  console.log(res.dataSync()[400])
+  //console.log(res.dataSync()[400])
   const transRes = res.transpose([0, 2, 1]); // transpose result [b, det, n] => [b, n, det]
   // console.log(res.dataSync())
   const boxes = tf.tidy(() => {
@@ -94,7 +94,7 @@ export const detect = async (source, model, canvasRef, callback = () => { }) => 
   console.timeEnd("session")
   
   const boxes_data = boxes.gather(nms, 0).dataSync(); // indexing boxes by nms index
-  console.log(boxes_data);
+  //console.log(boxes_data);
   const scores_data = scores.gather(nms, 0).dataSync(); // indexing scores by nms index
   let landmarks_data = landmarks.gather(nms, 0).dataSync(); // indexing classes by nms index
 

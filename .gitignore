@@ -1,4 +1,5 @@
 # Logs
+.venv
 logs
 *.log
 npm-debug.log*
@@ -30,3 +31,4 @@ images
 yolov8n-pose.pb
 yolov8n-pose.onnx
 .vscode
+.venv

@@ -20,12 +20,12 @@ const App = () => {
   const canvasRef = useRef(null);
 
   // model configs
-  const modelName = "yolov8n-pose";
+  const modelName = "yolo11s-pose";
 
   useEffect(() => {
     tf.ready().then(async () => {
       const yolov8 = await tf.loadGraphModel(
-        `${window.location.href}/${modelName}_web_model/model.json`,
+        `${window.location.href}${modelName}_web_model/model.json`,
         {
           onProgress: (fractions) => {
             setLoading({ loading: true, progress: fractions }); // set loading fractions

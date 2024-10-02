@@ -47,14 +47,14 @@ const connections = [
 ];
 
 export const renderBoxes = (canvasRef, landmarks_data, boxes_data, scores_data, xi, yi) => {
-  console.log(landmarks_data)
   const ctx = canvasRef.getContext("2d");
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
 
   for (let i = 0; i < scores_data.length; ++i) {
-    // filter based on class threshold
     const score = (scores_data[i] * 100).toFixed(1);
     let [y1, x1, y2, x2] = boxes_data.slice(i * 4, (i + 1) * 4);
+    
+    // Scale the bounding box coordinates
     x1 *= xi;
     x2 *= xi;
     y1 *= yi;
@@ -62,52 +62,52 @@ export const renderBoxes = (canvasRef, landmarks_data, boxes_data, scores_data, 
     const width = x2 - x1;
     const height = y2 - y1;
 
-    // draw box.
-    ctx.fillStyle = colors['nose'];
-
-    // draw border box.
-    ctx.strokeStyle = colors['nose']
-    ctx.lineWidth = Math.max(Math.min(ctx.canvas.width, ctx.canvas.height) / 200, 2.5);
+    // Draw bounding box
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2.5;
     ctx.strokeRect(x1, y1, width, height);
 
+    // Get keypoints for this pose
     let keypoints = landmarks_data.slice([i, 0, 0], [1, -1, -1]).reshape([17, 3]).arraySync();
     const conf_threshold = 0.6;
+
+    // Draw keypoints
     for (let j = 0; j < keypoints.length; j++) {
-      console.log(keypoints[j])
       const x = keypoints[j][0] * xi;
       const y = keypoints[j][1] * yi;
       const bodyPart = Object.keys(colors)[j];
-      if (keypoints[j][2]< conf_threshold){
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, 2 * Math.PI);
-      ctx.fillStyle = colors[bodyPart];
-      ctx.fill();
-      ctx.closePath();
-      keypoints[j][2] = true;
 
+      // Only draw keypoints above the confidence threshold
+      if (keypoints[j][2] >= conf_threshold) {
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[bodyPart];
+        ctx.fill();
+        ctx.closePath();
       }
-      else{
-        keypoints[j][2] = false;
-      }
-
     }
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'white';
 
+    // Draw connections between keypoints
     for (const [partA, partB] of connections) {
-      const x1 = keypoints[Object.keys(colors).indexOf(partA)][0] * xi;
-      const y1 = keypoints[Object.keys(colors).indexOf(partA)][1] * yi;
-      const x2 = keypoints[Object.keys(colors).indexOf(partB)][0] * xi;
-      const y2 = keypoints[Object.keys(colors).indexOf(partB)][1] * yi;
-      if (keypoints[Object.keys(colors).indexOf(partA)][2] == true && keypoints[Object.keys(colors).indexOf(partB)][2] == true) {
+      const idxA = Object.keys(colors).indexOf(partA);
+      const idxB = Object.keys(colors).indexOf(partB);
+      const x1 = keypoints[idxA][0] * xi;
+      const y1 = keypoints[idxA][1] * yi;
+      const x2 = keypoints[idxB][0] * xi;
+      const y2 = keypoints[idxB][1] * yi;
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.closePath();
+      // Only draw lines if both keypoints are above the confidence threshold
+      if (keypoints[idxA][2] >= conf_threshold && keypoints[idxB][2] >= conf_threshold) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   }
-}
+};
+
 
